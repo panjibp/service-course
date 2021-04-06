@@ -85,7 +85,6 @@ class MentorController extends Controller
         }
 
         $mentor->fill($data);
-
         $mentor->save();
 
         return response()->json([

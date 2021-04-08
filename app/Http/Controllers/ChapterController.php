@@ -9,6 +9,38 @@ use App\Models\Course;
 
 class ChapterController extends Controller
 {
+    public function index(Request $request)
+    {
+        $chapters = Chapter::query();
+
+        $courseId = $request->query('course_id');
+
+        $chapters->when($courseId, function ($query) use ($courseId) {
+            return $query->where('course_id', '=', $courseId);
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $chapters->get()
+        ]);
+    }
+
+    public function show($id)
+    {
+        $chapter = Chapter::find($id);
+        if (!$chapter) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'chapter not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $chapter
+        ]);
+    }
+
     public function create(Request $request)
     {
         $rules = [
@@ -86,6 +118,24 @@ class ChapterController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $chapter
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $chapter = Chapter::find($id);
+        if (!$chapter) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'chapter not found'
+            ], 404);
+        }
+
+        $chapter->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'chapter deleted'
         ]);
     }
 }

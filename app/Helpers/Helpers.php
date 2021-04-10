@@ -1,0 +1,47 @@
+<?php
+
+use Illuminate\Support\Facades\Http;
+
+function getUser($userId)
+{
+    $url = env('SERVICE_USER_URL') . 'users/' . $userId;
+
+    try {
+        $reponse = Http::timeout(10)->get($url);
+        $data = $reponse->json();
+        $data['http_code'] = $reponse->getStatusCode();
+        return $data;
+    } catch (\Throwable $th) {
+        return [
+            'status' => 'error',
+            'http_code' => 500,
+            'message' => 'service user unavailable'
+        ];
+    }
+}
+
+function getUserIds($userIds)
+{
+    $url = env('SERVICE_USER_URL') . 'users/' . $userIds;
+
+    try {
+        if (count($userIds) === 0) {
+            return [
+                'status' => 'error',
+                'http_code' => 200,
+                'data' => []
+            ];
+        }
+
+        $response = Http::timeout(10)->get($url, ['user_ids[]' => $userIds]);
+        $data = $response->json();
+        $data['http_code'] = $response->getStatusCode();
+        return $data;
+    } catch (\Throwable $th) {
+        return [
+            'status' => 'error',
+            'http_code' => 500,
+            'message' => 'service user unavailable'
+        ];
+    }
+}
